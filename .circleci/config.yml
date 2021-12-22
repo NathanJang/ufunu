@@ -1,0 +1,30 @@
+version: 2.1
+orbs:
+  node: circleci/node@5.0.0
+
+jobs:
+  install-node:
+    docker:
+      - image: 'cimg/base:stable'
+    steps:
+      - node/install:
+          install-yarn: true
+          node-version: '16.13'
+      - run: node --version
+  install-deps:
+    steps:
+      - checkout
+      - node/install-packages:
+          cache-path: ~/project/node_modules
+          override-ci-command: yarn install --frozen-lockfile
+
+  build:
+    steps:
+      - yarn-run: build
+      - persist_to_workspace:
+          root: ~/project/build
+          paths:
+            - '*'
+
+  deploy:
+
